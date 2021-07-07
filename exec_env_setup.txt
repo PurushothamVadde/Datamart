@@ -1,0 +1,36 @@
+# Setting up Git and Code Repo locally
+# --------------------------------------------
+# Install Git client software in your local system
+# Login to Git and create repo
+# Git clone, checkout and pull locally
+git clone <repo_url>
+git checkput
+git pull
+# Add .gitignore file inside
+# Create a project in PyCharm from that folder
+# Add the code inside
+# Git add, commit and push
+git add .
+git commit -a -m "initial commit"
+git push origin master
+
+
+# Setup an EMR cluster
+# ---------------------------------------------
+# Go to AWS console, navigate to lambda service and create a lambda (create_emr_cluster.py) using Python 3.7
+# Execute the lambda to create an single-node EMR cluster
+
+# Open an SSH session with the EMR cluster from your local system,
+ssh -i spark.pem hadoop@<cluster_dns_name>
+export LC_ALL=C
+sudo yum update -y
+sudo yum install git-core -y
+pip install pyyaml==5.3.1
+
+git clone https://github.com/PurushothamVadde/Datamart.git
+cd Datamart
+export PYTHONPATH="$PWD"
+
+# Copy 2 files (private key and .secrets) from local to EMR cluster's master node,
+scp -i test.pem xyz.pem hadoop@<cluster_dns_name>:/home/hadoop/dataframe-examples-py/
+scp -i test.pem .secrets hadoop@<cluster_dns_name>:/home/hadoop/dataframe-examples-py/
