@@ -1,10 +1,21 @@
+source_list:
+  -SB
+  -OL
+  -CP
+  -ADDR
+
+
+
 s3_conf:
-  s3_bucket: test-tushar-test
+  s3_bucket: dataframe-s3
+  staging_dir: pg_staging
+
 
 sftp_conf:
     filetype: csv
     delimiter: |
     directory: /home/ubuntu/data
+
 
 mysql_conf:
   dbtable: testdb.TRANSACTIONSYNC
