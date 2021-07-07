@@ -6,7 +6,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 import yaml
 import os.path
-import utils.aws_utils as ut
+from utils import aws_utils as ut
 
 
 if __name__ == '__main__':
