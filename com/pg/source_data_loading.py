@@ -3,6 +3,7 @@
 # write the dataframe in s3 partition by int_dt
 
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
 import yaml
 import os.path
 import utils.aws_utils as ut
@@ -29,7 +30,6 @@ if __name__ == '__main__':
     secret = open(app_secrets_path)
     app_secret = yaml.load(secret, Loader=yaml.FullLoader)
 
-
     jdbc_params = {
         "url": ut.get_mysql_jdbc_url(app_secret),
         "lowerBound": '1',
@@ -49,4 +49,6 @@ if __name__ == '__main__':
         .option(**jdbc_params)\
         .load()
 
+    tnxDF = tnxDF.withColumn("ins_dt", current_date())
+    tnxDF.show()
 # spark-submit --packages "mysql:mysql-connector-java:8.0.15" com/pg/source_data_loading.py
