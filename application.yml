@@ -4,8 +4,6 @@ source_list:
   - CP
   - ADDR
 
-
-
 s3_conf:
   s3_bucket: dataframe-s3
   staging_dir: pg_staging

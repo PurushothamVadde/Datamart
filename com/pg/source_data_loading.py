@@ -65,8 +65,8 @@ if __name__ == '__main__':
             # write data to S3 in parquet format
             tnxDF\
                 .write \
-                .mode("overwrite")\
-                .partitionBy("ins_dt")\
+                .mode("overwrite") \
+                .partitionBy("ins_dt") \
                 .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
         elif src == 'OL':
             # Reading Data from SFTP server
@@ -84,9 +84,9 @@ if __name__ == '__main__':
             ol_txn_df.show(5, False)
             # write data to S3 in parquet format
             ol_txn_df\
-                .write\
-                .mode("overwrite")\
-                .partitionBy("ins_dt")\
+                .write \
+                .mode("overwrite") \
+                .partitionBy("ins_dt") \
                 .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
 
 
@@ -95,16 +95,16 @@ if __name__ == '__main__':
                 .option("header", "false") \
                 .option("delimiter", ",") \
                 .option("inferSchema", "true") \
-                .csv("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "data/KC_Extract_1_20171009.csv") \
+                .csv("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/data/KC_Extract_1_20171009.csv") \
 
             cust_df = cust_df.withColumn("ins_dt", current_date())
             cust_df.show(5)
             # write data to S3
             cust_df \
                 .write \
-                .mode("overwrite")\
-                .partitionBy("ins_dt")\
-                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"]+ "/" + src)
+                .mode("overwrite") \
+                .partitionBy("ins_dt") \
+                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
 
         elif src == 'ADDR':
             # Reading from mongodb
@@ -120,10 +120,10 @@ if __name__ == '__main__':
             # write data to S3
             cust_addr_df \
                 .write \
-                .mode("overwrite")\
-                .partitionBy("ins_dt")\
-                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + "Customer_Address")
+                .mode("overwrite") \
+                .partitionBy("ins_dt") \
+                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
 
 
 
-# spark-submit --packages "mysql:mysql-connector-java:8.0.15, com.springml:spark-sftp_2.11:1.1.1, org.apache.hadoop:hadoop-aws:2.7.4, org.mongodb.spark:mongo-spark-connector_2.11:2.4.1" com/pg/source_data_loading.py
+# spark-submit --packages "mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1, org.apache.hadoop:hadoop-aws:2.7.4,org.mongodb.spark:mongo-spark-connector_2.11:2.4.1" com/pg/source_data_loading.py
