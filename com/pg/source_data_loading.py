@@ -66,7 +66,7 @@ if __name__ == '__main__':
             tnxDF\
                 .write\
                 .partitionBy("ins_dt")\
-                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + src)
+                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
         elif src == 'OL':
             # Reading Data from SFTP server
             ol_txn_df = spark.read\
@@ -85,7 +85,7 @@ if __name__ == '__main__':
             ol_txn_df\
                 .write\
                 .partitionBy("ins_dt")\
-                .parquet("s3a://" + app_conf["sftp_conf"]["staging_dir"]+ "/" + src)
+                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
 
 
         elif src == 'CP':
@@ -101,7 +101,7 @@ if __name__ == '__main__':
             cust_df \
                 .write\
                 .partitionBy("ins_dt")\
-                .parquet("s3a://" + app_conf["sftp_conf"]["staging_dir_s3"] + "/" + src)
+                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"]+ "/" + src)
 
         elif src == 'ADDR':
             # Reading from mongodb
@@ -118,7 +118,7 @@ if __name__ == '__main__':
             cust_addr_df \
                 .write\
                 .partitionBy("ins_dt")\
-                .parquet("s3a://" + app_conf["sftp_conf"]["staging_dir"] + "/" + "Customer_Address")
+                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + "Customer_Address")
 
 
 
