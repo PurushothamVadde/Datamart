@@ -24,9 +24,3 @@ def read_data_from_mysql(spark,jdbc_params):
         .load()
     return dataframe
 
-def write_to_s3(df, path):
-    print('Writing data to', path)
-    df.write \
-        .mode("overwrite") \
-        .partitionBy("ins_dt") \
-        .parquet(path)
