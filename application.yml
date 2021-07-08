@@ -1,36 +1,28 @@
 source_list:
   - SB
-#  - OL
-#  - CP
-#  - ADDR
+  - OL
+  - CP
+  - ADDR
 
-SB:
-  mysql_conf:
-    dbtable: testdb.TRANSACTIONSYNC
-    partition_column: App_Transaction_Id
-    query: "(select * from testdb.TRANSACTIONSYNC where Internal_Member_Id = 'PC7135361') as t"
+s3_conf:
+  s3_bucket: dataframe8790
+  staging_dir: staging
 
-OL:
-  sftp_conf:
+
+sftp_conf:
     filetype: csv
     delimiter: |
     directory: /home/ubuntu/data
-    filename: receipts_delta_GBR_14_10_2017.csv
 
-CP:
-  s3_conf:
-    s3_bucket: dataframe8790
-  filename: KC_Extract_1_20171009.csv
 
-ADDR:
-  mongodb_config:
-    database: customer
-    collection: address
+mysql_conf:
+  dbtable: testdb.TRANSACTIONSYNC
+  partition_column: App_Transaction_Id
+  query : "(select * from testdb.TRANSACTIONSYNC where Internal_Member_Id = 'PC7135361') as t"
 
-s3_conf:
-    s3_bucket: dataframe8790
-    staging_dir: staging
-
+mongodb_config:
+  database: school
+  collection: students
 
 redshift_conf:
   filetype: csv
