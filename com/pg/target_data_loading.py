@@ -1,18 +1,58 @@
-
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
 import yaml
 import os.path
 from com.pg.utils import aws_utils as ut
+if __name__ == '__main__':
 
-# Reading the Configuration files
-current_dir = os.path.abspath(os.path.dirname(__file__))
-app_config_path = os.path.abspath(current_dir + "/../../" + "application.yml")
-app_secrets_path = os.path.abspath(current_dir + "/../../" + ".secrets")
+    # create the spark object
+    spark = SparkSession\
+        .builder\
+        .appName("Data Ingestion from Project Sources")\
+        .getOrCreate()
 
-conf = open(app_config_path)
-app_conf = yaml.load(conf, Loader=yaml.FullLoader)
-secret = open(app_secrets_path)
-app_secret = yaml.load(secret, Loader=yaml.FullLoader)
+    # to log only the error logs in the console
+    spark.sparkContext.setLogLevel('ERROR')
 
-print("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"])
+    # Reading the Configuration files
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    app_config_path = os.path.abspath(current_dir + "/../../" + "application.yml")
+    app_secrets_path = os.path.abspath(current_dir + "/../../" + ".secrets")
 
-print("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/")
+    conf = open(app_config_path)
+    app_conf = yaml.load(conf, Loader=yaml.FullLoader)
+    secret = open(app_secrets_path)
+    app_secret = yaml.load(secret, Loader=yaml.FullLoader)
+
+    # Reading Data from S3
+    hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
+    hadoop_conf.set("fs.s3a.access.key", app_secret["s3_conf"]["access_key"])
+    hadoop_conf.set("fs.s3a.secret.key", app_secret["s3_conf"]["secret_access_key"])
+
+    jdbc_params = {"url": ut.get_mysql_jdbc_url(app_secret),
+                   "lowerBound": "1",
+                   "upperBound": "100",
+                   "dbtable": app_conf["mysql_conf"]["dbtable"],
+                   "numPartitions": "2",
+                   "partitionColumn": app_conf["mysql_conf"]["partition_column"],
+                   "user": app_secret["mysql_conf"]["username"],
+                   "password": app_secret["mysql_conf"]["password"]
+                   }
+
+    # use the ** operator/un-packer to treat a python dictionary as **kwargs
+    # Read Transactions Data from Mysql
+    tnxDF = spark \
+        .read.format("jdbc") \
+        .option("driver", "com.mysql.cj.jdbc.Driver") \
+        .options(**jdbc_params) \
+        .load()
+
+    tnxDF = tnxDF.withColumn("ins_dt", current_date())
+    tnxDF.show(5, False)
+
+    # write data to S3 in parquet format
+    tnxDF \
+        .write \
+        .mode("overwrite") \
+        .partitionBy("ins_dt") \
+        .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + 'SB')
