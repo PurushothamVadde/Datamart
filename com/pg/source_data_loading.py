@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
             # use the ** operator/un-packer to treat a python dictionary as **kwargs
             # Read Transactions Data from Mysql
-            txnDF = spark \
+            tnxDF = spark \
                 .read.format("jdbc") \
                 .option("driver", "com.mysql.cj.jdbc.Driver") \
                 .options(**jdbc_params) \
@@ -64,7 +64,8 @@ if __name__ == '__main__':
 
             # write data to S3 in parquet format
             tnxDF\
-                .write\
+                .write \
+                .mode("overwrite")\
                 .partitionBy("ins_dt")\
                 .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
         elif src == 'OL':
@@ -84,6 +85,7 @@ if __name__ == '__main__':
             # write data to S3 in parquet format
             ol_txn_df\
                 .write\
+                .mode("overwrite")\
                 .partitionBy("ins_dt")\
                 .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
 
@@ -99,7 +101,8 @@ if __name__ == '__main__':
             cust_df.show(5)
             # write data to S3
             cust_df \
-                .write\
+                .write \
+                .mode("overwrite")\
                 .partitionBy("ins_dt")\
                 .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"]+ "/" + src)
 
@@ -116,7 +119,8 @@ if __name__ == '__main__':
             cust_addr_df.show(5)
             # write data to S3
             cust_addr_df \
-                .write\
+                .write \
+                .mode("overwrite")\
                 .partitionBy("ins_dt")\
                 .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + "Customer_Address")
 
