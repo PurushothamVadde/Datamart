@@ -41,25 +41,24 @@ if __name__ == '__main__':
     for src in src_list:
 
         if src == 'SB':
-            jdbc_params = {
-                "url": ut.get_mysql_jdbc_url(app_secret),
-                "lowerBound": '1',
-                "upperBound": '100',
-                "dbtable": app_conf["mysql_conf"]["dbtable"],
-                "numPartitions": "2",
-                "partitionColumn": app_conf["mysql_conf"]["partition_column"],
-                "user": app_secret["mysql_conf"]["username"],
-                "password": app_secret["mysql_conf"]["password"]
-            }
+            jdbc_params = {"url": ut.get_mysql_jdbc_url(app_secret),
+                           "lowerBound": "1",
+                           "upperBound": "100",
+                           "dbtable": app_conf["mysql_conf"]["dbtable"],
+                           "numPartitions": "2",
+                           "partitionColumn": app_conf["mysql_conf"]["partition_column"],
+                           "user": app_secret["mysql_conf"]["username"],
+                           "password": app_secret["mysql_conf"]["password"]
+                           }
 
             # use the ** operator/un-packer to treat a python dictionary as **kwargs
             # Read Transactions Data from Mysql
-            tnxDF = spark\
-                .read\
-                .format("jdbc")\
-                .option("driver", "com.mysql.cj.jdbc.Driver")\
-                .option(**jdbc_params)\
+            txnDF = spark \
+                .read.format("jdbc") \
+                .option("driver", "com.mysql.cj.jdbc.Driver") \
+                .options(**jdbc_params) \
                 .load()
+
             tnxDF = tnxDF.withColumn("ins_dt", current_date())
             tnxDF.show(5, False)
 
@@ -123,6 +122,4 @@ if __name__ == '__main__':
 
 
 
-# spark-submit --packages "mysql:mysql-connector-java:8.0.15" com/pg/source_data_loading.py
-# spark-submit --packages "com.springml:spark-sftp_2.11:1.1.1" com/pg/source_data_loading.py
-# spark-submit --packages "org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
+# spark-submit --packages "mysql:mysql-connector-java:8.0.15, com.springml:spark-sftp_2.11:1.1.1, org.apache.hadoop:hadoop-aws:2.7.4, org.mongodb.spark:mongo-spark-connector_2.11:2.4.1" com/pg/source_data_loading.py
