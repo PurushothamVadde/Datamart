@@ -15,3 +15,4 @@ app_secret = yaml.load(secret, Loader=yaml.FullLoader)
 
 print("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"])
 
+print("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/")

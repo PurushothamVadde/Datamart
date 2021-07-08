@@ -5,8 +5,8 @@ source_list:
   - ADDR
 
 s3_conf:
-  s3_bucket: dataframe-s3
-  staging_dir: pg_staging
+  s3_bucket: dataframe8790
+  staging_dir: staging
 
 
 sftp_conf:
