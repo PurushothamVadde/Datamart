@@ -1,8 +1,8 @@
 source_list:
   - SB
-  #- OL
-  #- CP
-  #- ADDR
+  - OL
+  - CP
+  - ADDR
 
 s3_conf:
   s3_bucket: dataframe8790
