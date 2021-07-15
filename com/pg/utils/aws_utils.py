@@ -1,4 +1,3 @@
-
 def get_redshift_jdbc_url(redshift_config: dict):
     host = redshift_config["redshift_conf"]["host"]
     port = redshift_config["redshift_conf"]["port"]
@@ -10,7 +9,7 @@ def get_redshift_jdbc_url(redshift_config: dict):
 
 # we have to write a function that takes all the necessary info, read data from mysql and return a dataframe
 
-def get_my_sql_jdbc_url(mysql_config: dict):
+def get_mysql_jdbc_url(mysql_config: dict):
     host = mysql_config["mysql_conf"]["hostname"]
     port = mysql_config["mysql_conf"]["port"]
     database = mysql_config["mysql_conf"]["database"]
@@ -19,7 +18,7 @@ def get_my_sql_jdbc_url(mysql_config: dict):
 
 def read_from_sql(spark, app_conf, secret_conf):
     print("\nReading data from MYSQL DB,")
-    jdbc_params = {"url": get_my_sql_jdbc_url(secret_conf),
+    jdbc_params = {"url": get_mysql_jdbc_url(secret_conf),
                    "lowerBound": "1",
                    "upperBound": "100",
                    "dbtable": app_conf["mysql_conf"]["dbtable"],
