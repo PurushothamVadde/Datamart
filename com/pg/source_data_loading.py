@@ -5,16 +5,6 @@ import os.path
 from com.pg.utils import aws_utils as ut
 
 if __name__ == '__main__':
-
-    # create the spark object
-    spark = SparkSession\
-        .builder\
-        .appName("Data Ingestion from Project Sources")\
-        .getOrCreate()
-
-    # to log only the error logs in the console
-    spark.sparkContext.setLogLevel('ERROR')
-
     # Reading the Configuration files
     current_dir = os.path.abspath(os.path.dirname(__file__))
     app_config_path = os.path.abspath(current_dir + "/../../" + "application.yml")
@@ -24,6 +14,16 @@ if __name__ == '__main__':
     app_conf = yaml.load(conf, Loader=yaml.FullLoader)
     secret = open(app_secrets_path)
     app_secret = yaml.load(secret, Loader=yaml.FullLoader)
+
+    # create the spark object
+    spark = SparkSession\
+        .builder\
+        .appName("Data Ingestion from Project Sources")\
+        .config("spark.mongodb.input.uri", app_secret["mongodb_config"]["uri"])\
+        .getOrCreate()
+
+    # to log only the error logs in the console
+    spark.sparkContext.setLogLevel('ERROR')
 
     # Reading Data from S3
     hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
