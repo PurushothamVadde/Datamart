@@ -19,7 +19,7 @@ if __name__ == '__main__':
     spark = SparkSession\
         .builder\
         .appName("Data Ingestion from Project Sources")\
-        .config("spark.mongodb.input.uri", app_secret["mongodb_config"]["uri"])\
+        .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"])\
         .getOrCreate()
 
     # to log only the error logs in the console
