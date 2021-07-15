@@ -111,7 +111,7 @@ if __name__ == '__main__':
                 .option("collection", app_conf["mongodb_config"]["collection"])\
                 .load()
 
-            cust_addr_df = cust_df.withColumn("ins_dt", current_date())
+            cust_addr_df = cust_addr_df.withColumn("ins_dt", current_date())
             cust_addr_df.show(5)
             # write data to S3
             cust_addr_df \
