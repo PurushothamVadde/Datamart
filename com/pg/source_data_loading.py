@@ -23,7 +23,7 @@ if __name__ == '__main__':
         .builder\
         .appName("Data Ingestion from Project Sources")\
         .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"]) \
-        .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.3.0')\
+        .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.4.1')\
         .getOrCreate()
 
     # to log only the error logs in the console
@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
 # spark-submit --packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
 
-# spark-submit --packages "org.mongodb.spark:mongo-spark-connector_2.11:2.3.0,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
+# spark-submit --packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
 
 # .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"]) \
 # .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.3.0')
