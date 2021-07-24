@@ -5,8 +5,8 @@ import os.path
 from com.pg.utils import aws_utils as ut
 
 if __name__ == '__main__':
-    os.environ["PYSPARK_SUBMIT_ARGS"] = (
-         '--packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1" pyspark-shell')
+    # os.environ["PYSPARK_SUBMIT_ARGS"] = (
+    #      '--packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1" pyspark-shell')
 
     # Reading the Configuration files
     current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -22,7 +22,8 @@ if __name__ == '__main__':
     spark = SparkSession\
         .builder\
         .appName("Data Ingestion from Project Sources")\
-        .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"])\
+        .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"]) \
+        .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.3.0')\
         .getOrCreate()
 
     # to log only the error logs in the console
@@ -100,4 +101,4 @@ if __name__ == '__main__':
 # spark-submit --packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
 
 # .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"]) \
-# .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.4.1')
+# .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.3.0')
