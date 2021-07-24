@@ -5,8 +5,8 @@ import os.path
 from com.pg.utils import aws_utils as ut
 
 if __name__ == '__main__':
-    # os.environ["PYSPARK_SUBMIT_ARGS"] = (
-    #      '--packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1" pyspark-shell')
+    os.environ["PYSPARK_SUBMIT_ARGS"] = (
+         '--packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1" pyspark-shell')
 
     # Reading the Configuration files
     current_dir = os.path.abspath(os.path.dirname(__file__))
