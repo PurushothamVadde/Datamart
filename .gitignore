@@ -134,6 +134,6 @@ dmypy.json
 *.DS_Store
 *new_user_credentials*.csv
 
-.secrets
+*.secrets
 *.pem
 *.ppk
