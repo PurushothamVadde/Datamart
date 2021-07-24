@@ -5,9 +5,8 @@ import os.path
 from com.pg.utils import aws_utils as ut
 
 if __name__ == '__main__':
-
     os.environ["PYSPARK_SUBMIT_ARGS"] = (
-        '--packages "mysql:mysql-connector-java:8.0.15","com.amazonaws:aws-java-sdk:1.7.4","org.apache.hadoop:hadoop-aws:2.7.4","com.springml:spark-sftp_2.11:1.1.3","org.mongodb.spark:mongo-spark-connector_2.11:2.2.2" pyspark-shell'
+         '--packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1" pyspark-shell'
     )
     # Reading the Configuration files
     current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -23,7 +22,7 @@ if __name__ == '__main__':
     spark = SparkSession\
         .builder\
         .appName("Data Ingestion from Project Sources")\
-        .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"]+ "/customer.address")\
+        .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"])\
         .getOrCreate()
 
     # to log only the error logs in the console
@@ -46,7 +45,6 @@ if __name__ == '__main__':
 
             txn_df = txn_df.withColumn("ins_dt", current_date())
             txn_df.show(5, False)
-
             # write data to S3 in parquet format
             txn_df\
                 .write \
@@ -60,7 +58,6 @@ if __name__ == '__main__':
                                        app_secret,
                                        os.path.abspath(current_dir + "/../../" + app_secret["sftp_conf"]["pem"]),
                                        src_conf["sftp_conf"]["directory"] + "/receipts_delta_GBR_14_10_2017.csv")
-
             txn_df = txn_df.withColumn("ins_dt", current_date())
             txn_df.show(5, False)
             # write data to S3 in parquet format
@@ -70,11 +67,9 @@ if __name__ == '__main__':
                 .partitionBy("ins_dt") \
                 .parquet(src_path)
 
-
         elif src == 'CP':
             txn_df = ut.read_from_s3(spark,
                                 "s3a://" + app_conf["s3_conf"]["s3_bucket"] + src_conf["filename"])
-
             cust_df = txn_df.withColumn("ins_dt", current_date())
             cust_df.show(5)
             # write data to S3
@@ -86,11 +81,9 @@ if __name__ == '__main__':
 
         elif src == 'ADDR':
             # Reading from mongodb
-
             txn_df = ut.read_from_mongoDB(spark,
                                           src_conf["mongodb_config"]["database"],
                                           src_conf["mongodb_config"]["collection"])
-
             txn_df = txn_df.withColumn("ins_dt", current_date())
             txn_df.show(5)
             # write data to S3
@@ -104,7 +97,7 @@ if __name__ == '__main__':
 
 # spark-submit --packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
 
-# spark-submit --packages "org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
+# spark-submit --packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
 
 # .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"]) \
 # .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.4.1')
