@@ -1,7 +1,7 @@
 source_list:
-#  - SB
-#  - OL
-#  - CP
+  - SB
+  - OL
+  - CP
   - ADDR
 
 s3_conf:
