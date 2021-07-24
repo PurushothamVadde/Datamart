@@ -11,6 +11,7 @@ git pull
 # Add the code inside
 # Git add, commit and push
 git add .
+
 git commit -a -m "initial commit"
 git push origin master
 

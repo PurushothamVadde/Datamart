@@ -5,6 +5,10 @@ import os.path
 from com.pg.utils import aws_utils as ut
 
 if __name__ == '__main__':
+
+    os.environ["PYSPARK_SUBMIT_ARGS"] = (
+        '--packages "mysql:mysql-connector-java:8.0.15","com.amazonaws:aws-java-sdk:1.7.4","org.apache.hadoop:hadoop-aws:2.7.4","com.springml:spark-sftp_2.11:1.1.3","org.mongodb.spark:mongo-spark-connector_2.11:2.2.2" pyspark-shell'
+    )
     # Reading the Configuration files
     current_dir = os.path.abspath(os.path.dirname(__file__))
     app_config_path = os.path.abspath(current_dir + "/../../" + "application.yml")
@@ -19,7 +23,6 @@ if __name__ == '__main__':
     spark = SparkSession\
         .builder\
         .appName("Data Ingestion from Project Sources")\
-        .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.4.1') \
         .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"])\
         .getOrCreate()
 
@@ -101,6 +104,7 @@ if __name__ == '__main__':
 
 # spark-submit --packages "org.mongodb.spark:mongo-spark-connector_2.11:2.4.1,mysql:mysql-connector-java:8.0.15,com.springml:spark-sftp_2.11:1.1.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
 
-# spark-submit --packages "org.mongodb.spark:mongo-spark-connector_2.11:2.2.2,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
+# spark-submit --packages "org.apache.hadoop:hadoop-aws:2.7.4" com/pg/source_data_loading.py
 
 # .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"]) \
+# .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.4.1')
