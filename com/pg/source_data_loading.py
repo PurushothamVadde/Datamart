@@ -84,8 +84,8 @@ if __name__ == '__main__':
             # Reading from mongodb
 
             txn_df = ut.read_from_mongoDB(spark,
-                                          app_conf["mongodb_config"]["database"],
-                                          app_conf["mongodb_config"]["collection"])
+                                          src_conf["mongodb_config"]["database"],
+                                          src_conf["mongodb_config"]["collection"])
 
             txn_df = txn_df.withColumn("ins_dt", current_date())
             txn_df.show(5)
