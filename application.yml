@@ -1,7 +1,7 @@
 source_list:
 #  - SB
-  - OL
-#  - CP
+#  - OL
+  - CP
 #  - ADDR
 
 s3_conf:
@@ -24,7 +24,8 @@ ADDR:
     database: customer
     collection: address
 CP:
-  filename: kk
+  filename: /data/KC_Extract_1_20171009.csv
+
 redshift_conf:
   filetype: csv
   delimiter: |
