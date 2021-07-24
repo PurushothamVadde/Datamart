@@ -16,14 +16,14 @@ def get_mysql_jdbc_url(mysql_config: dict):
     return "jdbc:mysql://{}:{}/{}?autoReconnect=true&useSSL=false".format(host, port, database)
 
 
-def read_from_sql(spark, app_conf, secret_conf):
+def read_from_mysql(spark, table_name, part_col, secret_conf):
     print("\nReading data from MYSQL DB,")
     jdbc_params = {"url": get_mysql_jdbc_url(secret_conf),
                    "lowerBound": "1",
                    "upperBound": "100",
-                   "dbtable": app_conf["mysql_conf"]["dbtable"],
+                   "dbtable": table_name,
                    "numPartitions": "2",
-                   "partitionColumn": app_conf["mysql_conf"]["partition_column"],
+                   "partitionColumn": part_col,
                    "user": secret_conf["mysql_conf"]["username"],
                    "password": secret_conf["mysql_conf"]["password"]
                    }

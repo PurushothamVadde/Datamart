@@ -30,40 +30,26 @@ if __name__ == '__main__':
     hadoop_conf.set("fs.s3a.access.key", app_secret["s3_conf"]["access_key"])
     hadoop_conf.set("fs.s3a.secret.key", app_secret["s3_conf"]["secret_access_key"])
 
-
     src_list = app_conf["source_list"]
-
-
     for src in src_list:
-
+        src_conf = app_conf[src]
+        src_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src
         if src == 'SB':
-            jdbc_params = {"url": ut.get_mysql_jdbc_url(app_secret),
-                           "lowerBound": "1",
-                           "upperBound": "100",
-                           "dbtable": app_conf["mysql_conf"]["dbtable"],
-                           "numPartitions": "2",
-                           "partitionColumn": app_conf["mysql_conf"]["partition_column"],
-                           "user": app_secret["mysql_conf"]["username"],
-                           "password": app_secret["mysql_conf"]["password"]
-                           }
+            txn_df = ut.read_from_mysql(spark,
+                                        src_conf["mysql_conf"]["dbtable"],
+                                        src_conf["mysql_conf"]["partition_column"],
+                                        app_secret)
 
-            # use the ** operator/un-packer to treat a python dictionary as **kwargs
-            # Read Transactions Data from Mysql
-            tnxDF = spark \
-                .read.format("jdbc") \
-                .option("driver", "com.mysql.cj.jdbc.Driver") \
-                .options(**jdbc_params) \
-                .load()
-
-            tnxDF = tnxDF.withColumn("ins_dt", current_date())
-            tnxDF.show(5, False)
+            txn_df = txn_df.withColumn("ins_dt", current_date())
+            txn_df.show(5, False)
 
             # write data to S3 in parquet format
-            tnxDF\
+            txn_df\
                 .write \
                 .mode("overwrite") \
                 .partitionBy("ins_dt") \
-                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
+                .parquet(src_path)
+
         elif src == 'OL':
             # Reading Data from SFTP server
             ol_txn_df = spark.read\
