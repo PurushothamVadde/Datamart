@@ -55,8 +55,7 @@ if __name__ == '__main__':
             txn_df = ut.read_from_sftp(spark,
                                        app_secret,
                                        os.path.abspath(current_dir + "/../../" + app_secret["sftp_conf"]["pem"]),
-                                       app_conf["sftp_conf"]["directory"] + "/receipts_delta_GBR_14_10_2017.csv")
-
+                                       src_conf["sftp_conf"]["directory"] + "/receipts_delta_GBR_14_10_2017.csv")
 
             txn_df = txn_df.withColumn("ins_dt", current_date())
             txn_df.show(5, False)
