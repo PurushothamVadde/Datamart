@@ -82,21 +82,19 @@ if __name__ == '__main__':
 
         elif src == 'ADDR':
             # Reading from mongodb
-            cust_addr_df = spark\
-                .read\
-                .format("com.mongodb.spark.sql.DefaultSource")\
-                .option("database", app_conf["mongodb_config"]["database"])\
-                .option("collection", app_conf["mongodb_config"]["collection"])\
-                .load()
 
-            cust_addr_df = cust_addr_df.withColumn("ins_dt", current_date())
-            cust_addr_df.show(5)
+            txn_df = ut.read_from_mongoDB(spark,
+                                          app_conf["mongodb_config"]["database"],
+                                          app_conf["mongodb_config"]["collection"])
+
+            txn_df = txn_df.withColumn("ins_dt", current_date())
+            txn_df.show(5)
             # write data to S3
-            cust_addr_df \
+            txn_df \
                 .write \
                 .mode("overwrite") \
                 .partitionBy("ins_dt") \
-                .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src)
+                .parquet(src_path)
 
 
 
