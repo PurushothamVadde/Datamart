@@ -47,7 +47,7 @@ if __name__ == '__main__':
     txn_df.createOrReplaceTempView("CP")
     txn_df.printSchema()
     # spark.sql( "select * from CP").show()
-    spark.sql(app_conf['REGIS_DIM']['loadingQuery']).createOrReplaceTempView("CP")
+    # spark.sql(app_conf['REGIS_DIM']['loadingQuery']).createOrReplaceTempView("CP")
 
     file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/ADDR"
     print(file_path)
@@ -58,16 +58,25 @@ if __name__ == '__main__':
     ADDR_df.show(5, False)
     ADDR_df.createOrReplaceTempView("ADDR")
 
-    txn_df = spark.sql("""
-            select CP.*, ADDR.street, ADDR.City, ADDR.state,
-            from ADDR
-            INNER JOIN CP on CP.CNSM_ID = ADDR.consumer_id
-    """).toDF()
 
-    txn_df = txn_df.drop('ins_dt')
-    txn_df = txn_df.withColumn("ins_dt", current_date())
+    spark.sql(app_conf['REGIS_DIM']['loadingQuery']).show()
 
-    txn_df.show()
+
+
+
+
+
+
+
+
+    # txn_df = spark.sql("""
+    #         select CP.*, ADDR.street, ADDR.City, ADDR.state, from ADDR INNER JOIN CP on CP.CNSM_ID = ADDR.consumer_id
+    # """).toDF()
+    #
+    # txn_df = txn_df.drop('ins_dt')
+    # txn_df = txn_df.withColumn("ins_dt", current_date())
+    #
+    # txn_df.show()
 
 
     print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
