@@ -36,7 +36,10 @@ if __name__ == '__main__':
 
     file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/CP"
     print(file_path)
-    txn_df = spark.read.parquet(file_path)
+    txn_df = spark.read\
+        .option("header", "true")\
+        .option("delimiter", "|")\
+        .parquet(file_path)
     txn_df.show(5, False)
     txn_df.createOrReplaceTempView("CP")
     txn_df.printSchema()
