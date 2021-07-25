@@ -50,12 +50,12 @@ def read_from_sftp(spark, app_secret, secret_file, filepath):
 
 
 
-def read_from_s3(spark, path):
+def read_from_s3(spark, path, delimiter='|', header='true'):
     print("\nReading data from S3,")
     df = spark.read \
-        .option("header", "true") \
+        .option("header", header) \
         .format("csv") \
-        .option("delimeter", "|") \
+        .option("delimeter", delimiter) \
         .load(path)
     return df
 
