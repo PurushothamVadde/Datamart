@@ -22,7 +22,7 @@ if __name__ == '__main__':
     spark = SparkSession\
         .builder\
         .appName("Data Ingestion from Project Sources")\
-        .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"]) \
+        .config("spark.mongodb.input.uri", app_secret["mongodb_conf"]["uri"] + "/customer.address") \
         .config('spark.jars.packages', 'org.mongodb.spark:mongo-spark-connector_2.11:2.4.1')\
         .getOrCreate()
 
