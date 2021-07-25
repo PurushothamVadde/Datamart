@@ -2,6 +2,8 @@ from pyspark.sql import SparkSession
 import yaml
 import os.path
 import sys
+from pyspark.sql.functions import current_date
+
 import utils.aws_utils as ut
 
 if __name__ == '__main__':
@@ -56,34 +58,30 @@ if __name__ == '__main__':
     ADDR_df.show(5, False)
     ADDR_df.createOrReplaceTempView("ADDR")
 
-    spark.sql("""
-            select CP.*, ADDR.street, ADDR.City, ADDR.state
+    txn_df = spark.sql("""
+            select CP.*, ADDR.street, ADDR.City, ADDR.state,
             from ADDR
             INNER JOIN CP on CP.CNSM_ID = ADDR.consumer_id
-    """).show()
+    """).drop('ins_dt')
 
+    txn_df = txn_df.withColumn("ins_dt", current_date())
 
+    txn_df.show()
+    print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
 
+    jdbc_url = ut.get_redshift_jdbc_url(app_secret)
+    print(jdbc_url)
 
+    txn_df.coalesce(1).write \
+        .format("io.github.spark_redshift_community.spark.redshift") \
+        .option("url", jdbc_url) \
+        .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+        .option("forward_spark_s3_credentials", "true") \
+        .option("dbtable", "PUBLIC.TXN_FCT") \
+        .mode("overwrite") \
+        .save()
 
-
-
-
-    # print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
-    #
-    # jdbc_url = ut.get_redshift_jdbc_url(app_secret)
-    # print(jdbc_url)
-    #
-    # txn_df.coalesce(1).write \
-    #     .format("io.github.spark_redshift_community.spark.redshift") \
-    #     .option("url", jdbc_url) \
-    #     .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
-    #     .option("forward_spark_s3_credentials", "true") \
-    #     .option("dbtable", "PUBLIC.TXN_FCT") \
-    #     .mode("overwrite") \
-    #     .save()
-    #
-    # print("Completed   <<<<<<<<<")
+    print("Completed   <<<<<<<<<")
 
 # spark-submit --jars "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.36.1060/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar" --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/target_data_loading.py
 #  spark-submit  --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/target_data_loading.py
