@@ -87,6 +87,12 @@ if __name__ == '__main__':
                                           src_conf["mongodb_config"]["collection"])
             txn_df = txn_df.withColumn("ins_dt", current_date())
             txn_df.show(5)
+
+            txn_df = txn_df.withColumn("State", col("address.state"))\
+                .withColumn("City", col("address.city"))\
+                .withColumn("Country", col("address.country"))
+
+            txn_df.show(5)
             # write data to S3
             txn_df \
                 .write \
