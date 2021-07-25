@@ -46,3 +46,4 @@ REGIS_DIM:
       WHERE
         INS_DT = CURRENT_DATE
       ) CP
+

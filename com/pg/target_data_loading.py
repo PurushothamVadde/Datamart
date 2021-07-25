@@ -54,6 +54,13 @@ if __name__ == '__main__':
         .option("delimiter", "|") \
         .parquet(file_path)
     ADDR_df.show(5, False)
+    ADDR_df.createOrReplaceTempView("ADDR")
+
+
+
+    spark.sql("""
+            select consumer_id, street, City, state from ADDR INNER JOIN CP on CP.CNSM_ID = ADDR.consumer_id
+    """).show()
 
     # print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
     #
