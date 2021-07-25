@@ -91,7 +91,8 @@ if __name__ == '__main__':
             txn_df = txn_df.withColumn("street", col("address.street"))\
                 .withColumn("City", col("address.city"))\
                 .withColumn("state", col("address.state"))\
-                .drop('address')
+                .drop('address')\
+                .drop('_id')
 
             txn_df.show(5)
             # write data to S3
