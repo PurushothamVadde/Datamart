@@ -62,8 +62,8 @@ if __name__ == '__main__':
             select CP.*, ADDR.street, ADDR.City, ADDR.state,
             from ADDR
             INNER JOIN CP on CP.CNSM_ID = ADDR.consumer_id
-    """).drop('ins_dt')
-
+    """)
+    txn_df = txn_df.drop('ins_dt')
     txn_df = txn_df.withColumn("ins_dt", current_date())
 
     txn_df.show()
