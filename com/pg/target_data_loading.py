@@ -59,7 +59,9 @@ if __name__ == '__main__':
 
 
     spark.sql("""
-            select consumer_id, street, City, state from ADDR INNER JOIN CP on CP.CNSM_ID = ADDR.consumer_id
+            select consumer_id, street, City, state
+            from ADDR
+            INNER JOIN CP on CP.REGIS_CNSM_ID = ADDR.consumer_id
     """).show()
 
     # print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
