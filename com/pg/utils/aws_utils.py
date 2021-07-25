@@ -63,7 +63,7 @@ def read_from_s3(spark, path):
 def read_from_mongoDB(spark, database,collection):
     print("\nReading data from MongoDB,")
     df = spark.read \
-        .format("com.mongoDB.spark.sql.DefaultSource") \
+        .format("com.mongodb.spark.sql.DefaultSource") \
         .option("database", database) \
         .option("collection", collection) \
         .load()
