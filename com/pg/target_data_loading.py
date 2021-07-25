@@ -47,9 +47,14 @@ if __name__ == '__main__':
     # spark.sql( "select * from CP").show()
     spark.sql(app_conf['REGIS_DIM']['loadingQuery']).show(5, False)
 
+    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/ADDR"
+    print(file_path)
+    ADDR_df = spark.read \
+        .option("header", "true") \
+        .option("delimiter", "|") \
+        .parquet(file_path)
+    ADDR_df.show(5, False)
 
-
-    #
     # print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
     #
     # jdbc_url = ut.get_redshift_jdbc_url(app_secret)
