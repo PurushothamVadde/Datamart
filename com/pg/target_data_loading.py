@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     print("\nCreating Dataframe ingestion txn_fact dataset,")
 
-    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["s3_bucket"]["staging_dir"] + "/SB"
+    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/SB"
     print(file_path)
     txn_df = spark.read.parquet(file_path)
     txn_df.show(5, False)
