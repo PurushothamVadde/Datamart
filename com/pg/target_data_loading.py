@@ -63,8 +63,8 @@ if __name__ == '__main__':
             from ADDR
             INNER JOIN CP on CP.CNSM_ID = ADDR.consumer_id
     """)
-    txn_df = txn_df.drop('ins_dt')
-    txn_df = txn_df.withColumn("ins_dt", current_date())
+    # txn_df = txn_df.drop('ins_dt')
+    # txn_df = txn_df.withColumn("ins_dt", current_date())
 
     txn_df.show()
     print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
