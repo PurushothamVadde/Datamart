@@ -45,7 +45,7 @@ if __name__ == '__main__':
     txn_df.createOrReplaceTempView("CP")
     txn_df.printSchema()
     # spark.sql( "select * from CP").show()
-    spark.sql(app_conf['REGIS_DIM']['loadingQuery']).show((5, False)
+    spark.sql(app_conf['REGIS_DIM']['loadingQuery']).show(5, False)
 
 
 
