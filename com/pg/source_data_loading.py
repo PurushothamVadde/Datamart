@@ -88,9 +88,9 @@ if __name__ == '__main__':
             txn_df = txn_df.withColumn("ins_dt", current_date())
             txn_df.show(5)
 
-            txn_df = txn_df.withColumn("State", col("address.state"))\
+            txn_df = txn_df.withColumn("street", col("address.street"))\
                 .withColumn("City", col("address.city"))\
-                .withColumn("Country", col("address.country"))\
+                .withColumn("state", col("address.state"))\
                 .drop('address')
 
             txn_df.show(5)
