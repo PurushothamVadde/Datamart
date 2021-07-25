@@ -45,7 +45,7 @@ if __name__ == '__main__':
     txn_df.createOrReplaceTempView("CP")
     txn_df.printSchema()
     # spark.sql( "select * from CP").show()
-    spark.sql(app_conf['REGIS_DIM']['loadingQuery']).show(5, False)
+    spark.sql(app_conf['REGIS_DIM']['loadingQuery']).createOrReplaceTempView("CP")
 
     file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/ADDR"
     print(file_path)
@@ -56,13 +56,18 @@ if __name__ == '__main__':
     ADDR_df.show(5, False)
     ADDR_df.createOrReplaceTempView("ADDR")
 
-
-
     spark.sql("""
-            select consumer_id, street, City, state
+            select CP.*, ADDR.street, ADDR.City, ADDR.state
             from ADDR
-            INNER JOIN CP on CP.REGIS_CNSM_ID = ADDR.consumer_id
+            INNER JOIN CP on CP.CNSM_ID = ADDR.consumer_id
     """).show()
+
+
+
+
+
+
+
 
     # print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
     #
