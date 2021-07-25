@@ -33,9 +33,10 @@ if __name__ == '__main__':
     hadoop_conf.set("fs.s3a.secret.key", app_secret["s3_conf"]["secret_access_key"])
 
     print("\nCreating Dataframe ingestion txn_fact dataset,")
-    txn_df = spark.read \
-        .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"]["staging_dir"] + "/SB")
 
+    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"]["staging_dir"] + "/SB"
+    print(file_path)
+    txn_df = spark.read.parquet(file_path)
     txn_df.show(5, False)
 
 
