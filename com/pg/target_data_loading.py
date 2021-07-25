@@ -39,7 +39,7 @@ if __name__ == '__main__':
     txn_df = spark.read.parquet(file_path)
     txn_df.show(5, False)
     txn_df.createOrReplaceTempView("CP")
-
+    txn_df.printSchema()
     spark.sql("""
             SELECT
               MONOTONICALLY_INCREASING_ID() AS REGIS_KEY, REGIS_CNSM_ID AS CNSM_ID,REGIS_CTY_CODE AS CTY_CODE,
