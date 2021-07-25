@@ -44,23 +44,7 @@ if __name__ == '__main__':
     txn_df.show(5, False)
     txn_df.createOrReplaceTempView("CP")
     txn_df.printSchema()
-
-
-    spark.sql("""
-            SELECT
-              MONOTONICALLY_INCREASING_ID() AS REGIS_KEY, REGIS_CNSM_ID AS CNSM_ID,REGIS_CTY_CODE AS CTY_CODE,
-              REGIS_ID, REGIS_DATE, REGIS_LTY_ID AS LTY_ID, REGIS_CHANNEL, REGIS_GENDER, REGIS_CITY, INS_DT
-            FROM
-              (SELECT
-                DISTINCT REGIS_CNSM_ID, CAST(REGIS_CTY_CODE AS SMALLINT), CAST(REGIS_ID AS INTEGER),
-                REGIS_LTY_ID, REGIS_DATE, REGIS_CHANNEL, REGIS_GENDER, REGIS_CITY, INS_DT
-              FROM
-                CP
-              WHERE
-                INS_DT = CURRENT_DATE
-              ) CP
-            """) \
-        .show(5, False)
+    spark.sql( "select * from CP").show()
 
 
 
