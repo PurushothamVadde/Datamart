@@ -55,7 +55,7 @@ def read_from_s3(spark, path, delimiter='|', header='true'):
     df = spark.read \
         .option("header", header) \
         .format("csv") \
-        .option("delimeter", delimiter) \
+        .option("delimiter", delimiter) \
         .load(path)
     return df
 
