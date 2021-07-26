@@ -39,10 +39,9 @@ if __name__ == '__main__':
         print('Preparing', tgt, 'data,')
         tgt_conf = app_conf[tgt]
         if tgt == 'REGIS_DIM':
-            file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/"
             print('Loading the source data,')
             for src in tgt_conf['source_data']:
-                file_path += src
+                file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src
                 txn_df = spark.read\
                     .option("header", "true")\
                     .option("delimiter", "|")\
