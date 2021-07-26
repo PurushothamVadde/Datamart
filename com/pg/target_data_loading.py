@@ -65,6 +65,8 @@ if __name__ == '__main__':
             txn_df = spark.sql(app_conf['CHILD_DIM']['loadingQuery'])
             txn_df.show()
 
+            txn_df.createOrReplaceTempView(tgt_conf['source_data'])
+
             txn_df = ut.write_data_to_Redshift(txn_df,
                                                jdbc_url,
                                                "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp",
