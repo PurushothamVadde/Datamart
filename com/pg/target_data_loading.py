@@ -91,7 +91,7 @@ if __name__ == '__main__':
         .save()
     print("Completed   <<<<<<<<<")
 
-
+    # Reading Data From OL
     file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/OL"
     print(file_path)
     txn_df = spark.read\
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     txn_df.show(5, False)
     txn_df.createOrReplaceTempView("OL")
     txn_df.printSchema()
-
+    # Reading Data From SB
     file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/SB"
     print(file_path)
     txn_df = spark.read\
@@ -114,7 +114,16 @@ if __name__ == '__main__':
     txn_df.createOrReplaceTempView("SB")
     txn_df.printSchema()
 
+    # Reading Data from Redshift
+    REG_DIM = spark.read\
+        .format("io.github.spark_redshift_community.spark.redshift") \
+        .option("url", jdbc_url) \
+        .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+        .option("forward_spark_s3_credentials", "true") \
+        .option("dbtable", "DATAMART.REGIS_DIM") \
+        .load()
 
+    REG_DIM.show(5, False)
 
 
 
