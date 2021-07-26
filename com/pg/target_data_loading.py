@@ -115,7 +115,7 @@ if __name__ == '__main__':
     txn_df.printSchema()
 
     # Reading Data from Redshift
-    REG_DIM = spark.read\
+    REGIS_DIM = spark.read\
         .format("io.github.spark_redshift_community.spark.redshift") \
         .option("url", jdbc_url) \
         .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
@@ -123,7 +123,11 @@ if __name__ == '__main__':
         .option("dbtable", "DATAMART.REGIS_DIM") \
         .load()
 
-    REG_DIM.show(5, False)
+    REGIS_DIM.show(5, False)
+
+    # Fact Table
+    txn_df = spark.sql(app_conf['RTL_TXN_FCT']['loadingQuery'])
+    txn_df.show(5, False)
 
 
 
