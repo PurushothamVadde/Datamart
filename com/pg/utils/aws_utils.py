@@ -85,5 +85,4 @@ def write_data_to_Redshift(txn_df,jdbc_url,s3_path,redshift_table_name):
             .option("dbtable", redshift_table_name) \
             .mode("overwrite") \
             .save()
-    return 0
 

@@ -38,46 +38,49 @@ if __name__ == '__main__':
     for tgt in tgt_list:
         print('Preparing', tgt, 'data,')
         tgt_conf = app_conf[tgt]
+
         if tgt == 'REGIS_DIM':
             print('Loading the source data,')
             for src in tgt_conf['source_data']:
                 file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src
 
-                txn_df = ut.read_parquet_from_s3(spark,file_path)
-                txn_df.createOrReplaceTempView(src)
-                txn_df.printSchema()
-                txn_df.show(5, False)
+                src_df = ut.read_parquet_from_s3(spark, file_path)
+                src_df.createOrReplaceTempView(src)
+                src_df.printSchema()
+                src_df.show(5, False)
 
             print('Preparing the', tgt, 'data,')
-            txn_df = spark.sql(app_conf['REGIS_DIM']['loadingQuery'])
-            txn_df.show()
+            regis_dim_df = spark.sql(tgt_conf['loadingQuery'])
+            regis_dim_df.show()
             jdbc_url = ut.get_redshift_jdbc_url(app_secret)
             print(jdbc_url)
 
-            txn_df = ut.write_data_to_Redshift(txn_df,
+            ut.write_data_to_Redshift(regis_dim_df,
                                                jdbc_url,
                                                "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp",
-                                               app_conf['REGIS_DIM']['tableName'])
+                                               tgt_conf['tableName'])
             print("Completed   <<<<<<<<<")
 
         elif tgt == 'CHILD_DIM':
             src = tgt_conf['source_data']
-
             file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src
 
-            txn_df = ut.read_parquet_from_s3(spark, file_path)
-            txn_df.createOrReplaceTempView(src)
-            txn_df.printSchema()
-            txn_df.show(5, False)
+            src_df = ut.read_parquet_from_s3(spark, file_path)
+
+            src_df.createOrReplaceTempView(src)
+            src_df.printSchema()
+            src_df.show(5, False)
 
             print('Preparing the', tgt, 'data,')
-            txn_df = spark.sql(app_conf['CHILD_DIM']['loadingQuery'])
-            txn_df.show()
+            child_dim_df = spark.sql(tgt_conf['loadingQuery'])
+            child_dim_df.show()
+
             jdbc_url = ut.get_redshift_jdbc_url(app_secret)
-            txn_df = ut.write_data_to_Redshift(txn_df,
+
+            ut.write_data_to_Redshift(child_dim_df,
                                                jdbc_url,
                                                "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp",
-                                               app_conf['CHILD_DIM']['tableName'])
+                                               tgt_conf['tableName'])
             print("Completed   <<<<<<<<<")
 
         elif tgt == 'RTL_TXN_FCT':
