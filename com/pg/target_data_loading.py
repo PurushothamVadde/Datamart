@@ -44,7 +44,6 @@ if __name__ == '__main__':
                 file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src
 
                 txn_df = ut.read_parquet_from_s3(spark,file_path)
-
                 txn_df.createOrReplaceTempView(src)
                 txn_df.printSchema()
                 txn_df.show(5, False)
@@ -62,11 +61,19 @@ if __name__ == '__main__':
             print("Completed   <<<<<<<<<")
 
         elif tgt == 'CHILD_DIM':
+            src = tgt_conf['source_data']
+
+            file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src
+
+            txn_df = ut.read_parquet_from_s3(spark, file_path)
+            txn_df.createOrReplaceTempView(src)
+            txn_df.printSchema()
+            txn_df.show(5, False)
+
+            print('Preparing the', tgt, 'data,')
             txn_df = spark.sql(app_conf['CHILD_DIM']['loadingQuery'])
             txn_df.show()
-
-            txn_df.createOrReplaceTempView(tgt_conf['source_data'])
-
+            jdbc_url = ut.get_redshift_jdbc_url(app_secret)
             txn_df = ut.write_data_to_Redshift(txn_df,
                                                jdbc_url,
                                                "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp",
