@@ -61,7 +61,6 @@ if __name__ == '__main__':
     txn_df = spark.sql(app_conf['REGIS_DIM']['loadingQuery'])
     txn_df.show()
 
-
     print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
 
     jdbc_url = ut.get_redshift_jdbc_url(app_secret)
@@ -76,6 +75,14 @@ if __name__ == '__main__':
         .mode("overwrite") \
         .save()
     print("Completed   <<<<<<<<<")
+
+    txn_df = spark.sql(app_conf['CHILD_DIM']['loadingQuery'])
+    txn_df.show()
+
+
+
+
+
 
 # spark-submit --jars "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.36.1060/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar" --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/target_data_loading.py
 #  spark-submit  --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/target_data_loading.py
