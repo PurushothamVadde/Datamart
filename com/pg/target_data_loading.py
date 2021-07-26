@@ -124,6 +124,7 @@ if __name__ == '__main__':
         .load()
 
     REGIS_DIM.show(5, False)
+    REGIS_DIM.createOrReplaceTempView("REGIS_DIM")
 
     # Fact Table
     txn_df = spark.sql(app_conf['RTL_TXN_FCT']['loadingQuery'])
