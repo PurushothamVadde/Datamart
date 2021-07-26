@@ -98,12 +98,6 @@ if __name__ == '__main__':
                     src_df.printSchema()
                     src_df.show(5, False)
 
-                print('Preparing the', tgt, 'data,')
-                rtl_txn_fct_df = spark.sql(tgt_conf['loadingQuery'])
-                rtl_txn_fct_df.show()
-                jdbc_url = ut.get_redshift_jdbc_url(app_secret)
-                print(jdbc_url)
-
                 REGIS_DIM = spark.read \
                     .format("io.github.spark_redshift_community.spark.redshift") \
                     .option("url", jdbc_url) \
@@ -114,6 +108,13 @@ if __name__ == '__main__':
 
                 REGIS_DIM.show(5, False)
                 REGIS_DIM.createOrReplaceTempView("REGIS_DIM")
+
+                print('Preparing the', tgt, 'data,')
+                rtl_txn_fct_df = spark.sql(tgt_conf['loadingQuery'])
+                rtl_txn_fct_df.show()
+                jdbc_url = ut.get_redshift_jdbc_url(app_secret)
+                print(jdbc_url)
+
 
                 ut.write_data_to_Redshift(rtl_txn_fct_df,
                                               jdbc_url,
