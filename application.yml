@@ -5,8 +5,8 @@ source_list:
 #  - ADDR
 
 target_list:
-  - REGIS_DIM
-#  - CHILD_DIM
+#  - REGIS_DIM
+  - CHILD_DIM
 #  - RTL_TXN_FCT
 
 s3_conf:
