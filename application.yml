@@ -45,9 +45,9 @@ REGIS_DIM:
         REGIS_LTY_ID, REGIS_DATE, REGIS_CHANNEL, REGIS_GENDER, REGIS_CITY, ADDR.street as Street, ADDR.City as City, ADDR.state as State, CP.INS_DT as INS_DT
       FROM
         CP JOIN ADDR ON CP.REGIS_CNSM_ID = ADDR.consumer_id
-      WHERE
-        ADDR.ins_dt = CURRENT_DATE
       ) CP
 
 
 
+#      WHERE
+#        ADDR.ins_dt = CURRENT_DATE
