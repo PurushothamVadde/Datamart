@@ -76,6 +76,8 @@ if __name__ == '__main__':
         .save()
     print("Completed   <<<<<<<<<")
 
+
+    # Child_Dim
     txn_df = spark.sql(app_conf['CHILD_DIM']['loadingQuery'])
     txn_df.show()
 
@@ -89,6 +91,28 @@ if __name__ == '__main__':
         .save()
     print("Completed   <<<<<<<<<")
 
+
+    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/OL"
+    print(file_path)
+    txn_df = spark.read\
+        .option("header", "true")\
+        .option("delimiter", "|")\
+        .parquet(file_path)
+
+    txn_df.show(5, False)
+    txn_df.createOrReplaceTempView("OL")
+    txn_df.printSchema()
+
+    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/SB"
+    print(file_path)
+    txn_df = spark.read\
+        .option("header", "true")\
+        .option("delimiter", "|")\
+        .parquet(file_path)
+
+    txn_df.show(5, False)
+    txn_df.createOrReplaceTempView("SB")
+    txn_df.printSchema()
 
 
 
