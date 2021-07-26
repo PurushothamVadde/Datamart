@@ -34,101 +34,94 @@ if __name__ == '__main__':
     hadoop_conf.set("fs.s3a.access.key", app_secret["s3_conf"]["access_key"])
     hadoop_conf.set("fs.s3a.secret.key", app_secret["s3_conf"]["secret_access_key"])
 
-    print("\nCreating Dataframe ingestion txn_fact dataset,")
+    tgt_list = app_conf['target_list']
+    for tgt in tgt_list:
+        print('Preparing', tgt, 'data,')
+        tgt_conf = app_conf[tgt]
+        if tgt == 'REGIS_DIM':
+            file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/"
+            print('Loading the source data,')
+            for src in tgt_conf['source_data']:
+                file_path += src
+                txn_df = spark.read\
+                    .option("header", "true")\
+                    .option("delimiter", "|")\
+                    .parquet(file_path)
 
-    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/CP"
-    print(file_path)
-    txn_df = spark.read\
-        .option("header", "true")\
-        .option("delimiter", "|")\
-        .parquet(file_path)
+                txn_df.createOrReplaceTempView(src)
+                txn_df.printSchema()
+                txn_df.show(5, False)
 
-    txn_df.show(5, False)
-    txn_df.createOrReplaceTempView("CP")
-    txn_df.printSchema()
+            print('Preparing the', tgt, 'data,')
+            txn_df = spark.sql(app_conf['REGIS_DIM']['loadingQuery'])
+            txn_df.show()
 
+            jdbc_url = ut.get_redshift_jdbc_url(app_secret)
+            print(jdbc_url)
 
-    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/ADDR"
-    print(file_path)
-    ADDR_df = spark.read \
-        .option("header", "true") \
-        .option("delimiter", "|") \
-        .parquet(file_path)
-    ADDR_df.show(5, False)
-    ADDR_df.createOrReplaceTempView("ADDR")
+            txn_df.coalesce(1).write \
+                .format("io.github.spark_redshift_community.spark.redshift") \
+                .option("url", jdbc_url) \
+                .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+                .option("forward_spark_s3_credentials", "true") \
+                .option("dbtable", "DATAMART.REGIS_DIM") \
+                .mode("overwrite") \
+                .save()
+            print("Completed   <<<<<<<<<")
 
+        elif tgt == 'CHILD_DIM':
+            txn_df = spark.sql(app_conf['CHILD_DIM']['loadingQuery'])
+            txn_df.show()
 
-    txn_df = spark.sql(app_conf['REGIS_DIM']['loadingQuery'])
-    txn_df.show()
+            txn_df.coalesce(1).write \
+                .format("io.github.spark_redshift_community.spark.redshift") \
+                .option("url", jdbc_url) \
+                .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+                .option("forward_spark_s3_credentials", "true") \
+                .option("dbtable", "DATAMART.CHILD_DIM") \
+                .mode("overwrite") \
+                .save()
+            print("Completed   <<<<<<<<<")
 
-    print("Writing txn_fact dataframe to AWS Redshift Table   >>>>>>>")
+        elif tgt == 'RTL_TXN_FCT':
+            # Reading Data From OL
+            file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/OL"
+            print(file_path)
+            txn_df = spark.read\
+                .option("header", "true")\
+                .option("delimiter", "|")\
+                .parquet(file_path)
 
-    jdbc_url = ut.get_redshift_jdbc_url(app_secret)
-    print(jdbc_url)
+            txn_df.show(5, False)
+            txn_df.createOrReplaceTempView("OL")
+            txn_df.printSchema()
+            # Reading Data From SB
+            file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/SB"
+            print(file_path)
+            txn_df = spark.read\
+                .option("header", "true")\
+                .option("delimiter", "|")\
+                .parquet(file_path)
 
-    txn_df.coalesce(1).write \
-        .format("io.github.spark_redshift_community.spark.redshift") \
-        .option("url", jdbc_url) \
-        .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
-        .option("forward_spark_s3_credentials", "true") \
-        .option("dbtable", "DATAMART.REGIS_DIM") \
-        .mode("overwrite") \
-        .save()
-    print("Completed   <<<<<<<<<")
+            txn_df.show(5, False)
+            txn_df.createOrReplaceTempView("SB")
+            txn_df.printSchema()
 
+            # Reading Data from Redshift
+            REGIS_DIM = spark.read\
+                .format("io.github.spark_redshift_community.spark.redshift") \
+                .option("url", jdbc_url) \
+                .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+                .option("forward_spark_s3_credentials", "true") \
+                .option("dbtable", "DATAMART.REGIS_DIM") \
+                .load()
 
-    # Child_Dim
-    txn_df = spark.sql(app_conf['CHILD_DIM']['loadingQuery'])
-    txn_df.show()
+            REGIS_DIM.show(5, False)
+            REGIS_DIM.createOrReplaceTempView("REGIS_DIM")
 
-    txn_df.coalesce(1).write \
-        .format("io.github.spark_redshift_community.spark.redshift") \
-        .option("url", jdbc_url) \
-        .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
-        .option("forward_spark_s3_credentials", "true") \
-        .option("dbtable", "DATAMART.CHILD_DIM") \
-        .mode("overwrite") \
-        .save()
-    print("Completed   <<<<<<<<<")
-
-    # Reading Data From OL
-    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/OL"
-    print(file_path)
-    txn_df = spark.read\
-        .option("header", "true")\
-        .option("delimiter", "|")\
-        .parquet(file_path)
-
-    txn_df.show(5, False)
-    txn_df.createOrReplaceTempView("OL")
-    txn_df.printSchema()
-    # Reading Data From SB
-    file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/SB"
-    print(file_path)
-    txn_df = spark.read\
-        .option("header", "true")\
-        .option("delimiter", "|")\
-        .parquet(file_path)
-
-    txn_df.show(5, False)
-    txn_df.createOrReplaceTempView("SB")
-    txn_df.printSchema()
-
-    # Reading Data from Redshift
-    REGIS_DIM = spark.read\
-        .format("io.github.spark_redshift_community.spark.redshift") \
-        .option("url", jdbc_url) \
-        .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
-        .option("forward_spark_s3_credentials", "true") \
-        .option("dbtable", "DATAMART.REGIS_DIM") \
-        .load()
-
-    REGIS_DIM.show(5, False)
-    REGIS_DIM.createOrReplaceTempView("REGIS_DIM")
-
-    # Fact Table
-    txn_df = spark.sql(app_conf['RTL_TXN_FCT']['loadingQuery'])
-    txn_df.show(5, False)
+            # Fact Table
+            txn_df = spark.sql(app_conf['RTL_TXN_FCT']['loadingQuery'])
+            txn_df.show(5, False)
 
 
 
