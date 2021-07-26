@@ -72,7 +72,7 @@ if __name__ == '__main__':
         .option("url", jdbc_url) \
         .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
         .option("forward_spark_s3_credentials", "true") \
-        .option("dbtable", "PUBLIC.REGIS_DIM") \
+        .option("dbtable", "DATAMART.REGIS_DIM") \
         .mode("overwrite") \
         .save()
     print("Completed   <<<<<<<<<")
