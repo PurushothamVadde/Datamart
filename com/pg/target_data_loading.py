@@ -104,6 +104,17 @@ if __name__ == '__main__':
                 jdbc_url = ut.get_redshift_jdbc_url(app_secret)
                 print(jdbc_url)
 
+                REGIS_DIM = spark.read \
+                    .format("io.github.spark_redshift_community.spark.redshift") \
+                    .option("url", jdbc_url) \
+                    .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
+                    .option("forward_spark_s3_credentials", "true") \
+                    .option("dbtable", "DATAMART.REGIS_DIM") \
+                    .load()
+
+                REGIS_DIM.show(5, False)
+                REGIS_DIM.createOrReplaceTempView("REGIS_DIM")
+
                 ut.write_data_to_Redshift(rtl_txn_fct_df,
                                               jdbc_url,
                                               "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp",
