@@ -123,52 +123,5 @@ if __name__ == '__main__':
                 print("Completed   <<<<<<<<<")
 
 
-
-            # Reading Data From OL
-            # src = tgt_conf['source_data']
-            # file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src
-            #
-            # file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/OL"
-            # print(file_path)
-            #
-            # src_df = ut.read_parquet_from_s3(spark, file_path)
-            # txn_df = spark.read\
-            #     .option("header", "true")\
-            #     .option("delimiter", "|")\
-            #     .parquet(file_path)
-            #
-            # txn_df.show(5, False)
-            # txn_df.createOrReplaceTempView("OL")
-            # txn_df.printSchema()
-            # # Reading Data From SB
-            # file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/SB"
-            # print(file_path)
-            # txn_df = spark.read\
-            #     .option("header", "true")\
-            #     .option("delimiter", "|")\
-            #     .parquet(file_path)
-            #
-            # txn_df.show(5, False)
-            # txn_df.createOrReplaceTempView("SB")
-            # txn_df.printSchema()
-            #
-            # # Reading Data from Redshift
-            # REGIS_DIM = spark.read\
-            #     .format("io.github.spark_redshift_community.spark.redshift") \
-            #     .option("url", jdbc_url) \
-            #     .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
-            #     .option("forward_spark_s3_credentials", "true") \
-            #     .option("dbtable", "DATAMART.REGIS_DIM") \
-            #     .load()
-            #
-            # REGIS_DIM.show(5, False)
-            # REGIS_DIM.createOrReplaceTempView("REGIS_DIM")
-            #
-            # # Fact Table
-            # txn_df = spark.sql(app_conf['RTL_TXN_FCT']['loadingQuery'])
-            # txn_df.show(5, False)
-
-
-
 # spark-submit --jars "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.36.1060/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar" --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/target_data_loading.py
 #  spark-submit  --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" com/pg/target_data_loading.py
