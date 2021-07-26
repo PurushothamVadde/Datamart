@@ -42,10 +42,8 @@ if __name__ == '__main__':
             print('Loading the source data,')
             for src in tgt_conf['source_data']:
                 file_path = "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/" + app_conf["s3_conf"]["staging_dir"] + "/" + src
-                txn_df = spark.read\
-                    .option("header", "true")\
-                    .option("delimiter", "|")\
-                    .parquet(file_path)
+
+                txn_df = ut.read_parquet_from_s3(spark,file_path)
 
                 txn_df.createOrReplaceTempView(src)
                 txn_df.printSchema()
@@ -54,32 +52,23 @@ if __name__ == '__main__':
             print('Preparing the', tgt, 'data,')
             txn_df = spark.sql(app_conf['REGIS_DIM']['loadingQuery'])
             txn_df.show()
-
             jdbc_url = ut.get_redshift_jdbc_url(app_secret)
             print(jdbc_url)
 
-            txn_df.coalesce(1).write \
-                .format("io.github.spark_redshift_community.spark.redshift") \
-                .option("url", jdbc_url) \
-                .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
-                .option("forward_spark_s3_credentials", "true") \
-                .option("dbtable", "DATAMART.REGIS_DIM") \
-                .mode("overwrite") \
-                .save()
+            txn_df = ut.write_data_to_Redshift(txn_df,
+                                               jdbc_url,
+                                               "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp",
+                                               app_conf['REGIS_DIM']['tableName'])
             print("Completed   <<<<<<<<<")
 
         elif tgt == 'CHILD_DIM':
             txn_df = spark.sql(app_conf['CHILD_DIM']['loadingQuery'])
             txn_df.show()
 
-            txn_df.coalesce(1).write \
-                .format("io.github.spark_redshift_community.spark.redshift") \
-                .option("url", jdbc_url) \
-                .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp") \
-                .option("forward_spark_s3_credentials", "true") \
-                .option("dbtable", "DATAMART.CHILD_DIM") \
-                .mode("overwrite") \
-                .save()
+            txn_df = ut.write_data_to_Redshift(txn_df,
+                                               jdbc_url,
+                                               "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp",
+                                               app_conf['CHILD_DIM']['tableName'])
             print("Completed   <<<<<<<<<")
 
         elif tgt == 'RTL_TXN_FCT':

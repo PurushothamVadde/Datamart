@@ -69,7 +69,21 @@ def read_from_mongoDB(spark, database,collection):
         .load()
     return df
 
+def read_parquet_from_s3(spark,file_path):
+    return spark.read \
+        .option("header", "true") \
+        .option("delimiter", "|") \
+        .parquet(file_path)
 
 
-
+def write_data_to_Redshift(txn_df,jdbc_url,s3_path,redshift_table_name):
+    txn_df.coalesce(1).write \
+            .format("io.github.spark_redshift_community.spark.redshift") \
+            .option("url", jdbc_url) \
+            .option("tempdir", s3_path) \
+            .option("forward_spark_s3_credentials", "true") \
+            .option("dbtable", redshift_table_name) \
+            .mode("overwrite") \
+            .save()
+    return 0
 
